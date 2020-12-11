@@ -1,0 +1,21 @@
+#######################
+# Demo steps
+
+cd /home/pi/rpi_detect_track
+source ./venv/bin/activate
+cd rpi
+
+# Test the camera
+# Video from camera module will be displayed on the screen
+python ./rpi_detect_track.py --test camera
+
+# Test pan-tilt hat
+python ./rpi_detect_track.py --test pantilt
+
+# Test object detection and tracking
+python ./rpi_detect_track.py
+
+# To test TPU (Not in demo video)
+python ./rpi_detect_track.py --tpu
+
+

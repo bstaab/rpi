@@ -1,0 +1,46 @@
+#########################################################################
+# Instructions to setup and run the Raspberry Pi detect and track program
+cd /home/pi
+mkdir rpi_detect_track && cd rpi_detect_track
+
+# Pull project files
+git clone https://github.com/bstaab/rpi.git
+
+# Make and activate Python virtual environment
+python3.6 -m venv venv
+source ./venv/bin/activate
+
+# Install dependencies
+pip install picamera
+pip install numpy
+pip install pantilthat
+pip install Pillow
+pip install tensorflow
+pip install smbus
+
+# https://raspberrypi.stackexchange.com/questions/107483/error-installing-tensorflow-cannot-find-libhdfs-so
+sudo apt-get install -y libhdf5-dev libc-ares-dev libeigen3-dev
+python -m pip install keras_applications==1.0.8 --no-deps
+python -m pip install keras_preprocessing==1.1.0 --no-deps
+python -m pip install h5py==2.9.0
+sudo apt-get install -y openmpi-bin libopenmpi-dev
+sudo apt-get install -y libatlas-base-dev
+python -m pip install -U six wheel mock
+wget https://github.com/lhelontra/tensorflow-on-arm/releases/download/v2.2.0/tensorflow-2.2.0-cp37-none-linux_armv7l.whl
+python -m pip uninstall tensorflow
+python -m pip install tensorflow-2.3.0-cp37-none-linux_armv7l.whl
+
+#For --edge-tpu
+pip install https://dl.google.com/coral/python/tflite_runtime-2.1.0.post1-cp37-cp37m-linux_armv7l.whl
+
+https://github.com/lhelontra/tensorflow-on-arm/releases/download/v2.2.0/tensorflow-2.2.0-cp37-none-linux_armv7l.whl
+pip install tensorflow-2.0.0-cp37-none-linux_armv7l.whl
+
+# Get packages required for OpenCV
+sudo apt-get -y install libjpeg-dev libtiff5-dev libjasper-dev libpng12-dev
+sudo apt-get -y install libavcodec-dev libavformat-dev libswscale-dev libv4l-dev
+sudo apt-get -y install libxvidcore-dev libx264-dev
+sudo apt-get -y install qt4-dev-tools libatlas-base-dev
+
+# Need to get an older version of OpenCV because version 4 has errors
+pip3 install opencv-python==3.4.6.27

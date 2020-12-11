@@ -1,0 +1,91 @@
+####################################################################################################
+# Train an object detector - Towards Data Science 
+
+# On a linux host
+mkdir -p /opt/data/bstaab/cs581 && cd /opt/data/bstaab/cs581
+python3 -m venv venv
+source ./venv/bin/activate
+
+pip install tensorflow-gpu
+pip install pillow Cython lxml jupyter matplotlib
+brew install protobuf
+
+cd ./venv/lib/python3.6/site-packages/tensorflow
+git clone https://github.com/tensorflow/models.git
+
+cd models/research
+protoc object_detection/protos/*.proto --python_out=.
+export PYTHONPATH=$PYTHONPATH:`pwd`:`pwd`/slim
+
+cd ..
+mkdir -p annotations/xmls images checkpoints tf_record
+
+# Manually select and process images (using labelImg)
+Copy images to 'models/annotations/xmls'
+
+vi models/annotations/label_map.pbtxt
+# add the following
+item {
+    id: 1
+    name: 'person'
+}
+
+vi models/annotations/trainval.txt
+# Add list of file names that were manually processed w/o extension
+1
+2
+...
+199
+
+# Get XML to CSV file
+# https://gist.github.com/iKhushPatel/ed1f837656b155d9b94d45b42e00f5e4 
+
+# Get create_tf_record.py
+# https://gist.github.com/iKhushPatel/5614a36f26cf6459cc49c8248e8b5b48
+# Save it to models/research/object_detection/dataset_tools
+
+# Create train/test data split
+python research/object_detection/dataset_tools/create_tf_record.py
+
+# verify
+mv models/research/train.record models/tf_record
+mv models/research/val.record models/tf_record 
+
+# Get pre-trained model 
+wget http://download.tensorflow.org/models/object_detection/ssd_mobilenet_v2_coco_2018_03_29.tar.gz
+mv model.ckpt.meta model.ckpt.index model.ckpt.data-00000-of-00001 models/checkpoints
+
+# Modify config files per insntructions on doc
+models/research/object_detection/samples/configs
+num_classes = 1
+fine_tune_checkpoint = checkpoints/model.ckpt
+
+# Train the model
+cd tensorflow/models
+mkdir train
+mkdir eval
+python research/object_detection/train.py \
+    --logtostderr 
+    --train_dir=train \
+    --pipeline_config_path=ssd_mobilenet_v2_coco.config
+
+mkdir fine_tuned_model
+python research/object_detection/export_inference_graph.py \    
+--input_type image_tensor \    
+--pipeline_config_path ssd_mobilenet_v2_coco.config \    
+--trained_checkpoint_prefix  train/model.ckpt-<the_highest_checkpoint_number> \    
+--output_directory fine_tuned_model
+
+# Convert the model using instructions from tensorflow
+
+
+
+
+
+
+
+
+
+
+
+
